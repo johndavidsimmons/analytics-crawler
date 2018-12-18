@@ -12,14 +12,11 @@ from scrapy.utils.project import get_project_settings
 
 class ScriptSpider(scrapy.Spider):
     name: str = "script_check"
-    
-    # scraping hub can't find env variables in the spider
-    # so it must pass as an argument
-    # scrapy crawl script_check -a http_user=abc123
+    # http_user = "0deb8211a13e4260a3fc5eba4616ade5"
     try:
         http_user = self.http_user
     except:
-        http_user = os.getenv("http_user")
+        http_user = ""
 
 
     try:

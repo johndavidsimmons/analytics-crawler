@@ -1,0 +1,13 @@
+setup.py
+analytics_check/__init__.py
+analytics_check/items.py
+analytics_check/middlewares.py
+analytics_check/pipelines.py
+analytics_check/settings.py
+analytics_check/spiders/__init__.py
+analytics_check/spiders/script_check.py
+project.egg-info/PKG-INFO
+project.egg-info/SOURCES.txt
+project.egg-info/dependency_links.txt
+project.egg-info/entry_points.txt
+project.egg-info/top_level.txt
