@@ -6,8 +6,8 @@ from typing import List
 
 rocket:str = u"\U0001F680"
 
-table_data: List = [
-    ["Section", 'DTM/Launch Present', 'Timestamp']
+table_data: List[list] = [
+    ["Path", "Section", 'DTM/Launch Present', 'Timestamp']
 ]
 
 class PrintTablePipeline(object):
@@ -20,9 +20,10 @@ class PrintTablePipeline(object):
         print(table.table)
 
     def process_item(self, item, spider):
-        output_color: str = 'green' if item['script_exists'] else 'red'
-
+        output_color:str = 'green' if item['script_exists'] else 'red'
+        path:str = item['url'].split(".com")[-1]
         table_data.append([
+            path,
             item['channel'],
             colored(item['script_exists'], output_color),
             item['last_checked']]
