@@ -1,4 +1,5 @@
 import os
+import pkgutil
 
 from terminaltables import AsciiTable # type: ignore
 from termcolor import colored # type: ignore
@@ -53,36 +54,27 @@ class EmailPipeline(object):
         )
 
     def open_spider(self, spider):
-        self.false_items: List[str] = []    
+        self.false_items: List[str] = []
+        self.all_items: List[str] = []    
 
     def process_item(self, item, spider):
         if not item['script_exists']:
             self.false_items.append(item)
+        self.all_items.append(item)
         return item
 
     def close_spider(self, spider):
 
-        # If there are items in the list
+        # If there are false items in the list
         if self.false_items:
 
             # jinja template
             from jinja2 import Template
-            template = Template(
-                """
-                <h1>DTM/Launch Report</h1>
-                <p>Rows of data</p>
-                <ul>
-                    <li>
-                    {% for row in data %}
-                        {{ row }}
-                    {% endfor %}
-                    </li>
-                </ul>
-                """
-            )
-
-            body:str = template.render(data=self.false_items)
-
+            template_file:Optional[bytes] = pkgutil.get_data("analytics_check", "resources/template.html")
+            template_string:str = template_file.decode("utf-8")
+            template = Template(template_string)
+            body:str = template.render(data=self.all_items)
+           
             import boto3 # type: ignore
             from botocore.exceptions import ClientError # type: ignore
 

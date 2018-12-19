@@ -1,0 +1,23 @@
+<h1>Analytics Report</h1>
+<table style="border: 1px solid black; border-collapse: collapse; padding: 1em;">
+  <tr style="border: 1px solid black; border-collapse: collapse; padding: 1em;">
+    <th style="border: 1px solid black; border-collapse: collapse; padding: 1em;">Section</th>
+    <th style="border: 1px solid black; border-collapse: collapse; padding: 1em;">URL</th>
+    <th style="border: 1px solid black; border-collapse: collapse; padding: 1em;">DTM/Launch Present</th>
+    <th style="border: 1px solid black; border-collapse: collapse; padding: 1em;">Timestamp</th>
+  </tr>
+  {% for row in data %}
+      <tr style="border: 1px solid black; border-collapse: collapse; padding: 1em;"
+        {% if row['script_exists']%}
+          bgcolor="lightgreen"
+        {% else %}
+          bgcolor="pink"
+        {% endif %}
+      >
+        <td style="border: 1px solid black; border-collapse: collapse; padding: 1em;">{{row["channel"]}}</td>
+        <td style="border: 1px solid black; border-collapse: collapse; padding: 1em;">{{row["url"]}}</td>
+        <td style="border: 1px solid black; border-collapse: collapse; padding: 1em;">{{row["script_exists"]}}</td>
+        <td style="border: 1px solid black; border-collapse: collapse; padding: 1em;">{{row["last_checked"]}}</td>
+      </tr>
+  {% endfor %}
+</table>

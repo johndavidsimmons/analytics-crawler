@@ -1,4 +1,5 @@
 import os
+import pkgutil
 
 from terminaltables import AsciiTable # type: ignore
 from termcolor import colored # type: ignore
@@ -6,8 +7,8 @@ from typing import List
 
 rocket:str = u"\U0001F680"
 
-table_data: List = [
-    ["Section", 'DTM/Launch Present', 'Timestamp']
+table_data: List[list] = [
+    ["Path", "Section", 'DTM/Launch Present', 'Timestamp']
 ]
 
 class PrintTablePipeline(object):
@@ -20,9 +21,10 @@ class PrintTablePipeline(object):
         print(table.table)
 
     def process_item(self, item, spider):
-        output_color: str = 'green' if item['script_exists'] else 'red'
-
+        output_color:str = 'green' if item['script_exists'] else 'red'
+        path:str = item['url'].split(".com")[-1]
         table_data.append([
+            path,
             item['channel'],
             colored(item['script_exists'], output_color),
             item['last_checked']]
@@ -52,11 +54,13 @@ class EmailPipeline(object):
         )
 
     def open_spider(self, spider):
-        self.false_items: List[str] = []    
+        self.false_items: List[str] = []
+        self.all_items: List[str] = []    
 
     def process_item(self, item, spider):
         if not item['script_exists']:
             self.false_items.append(item)
+        self.all_items.append(item)
         return item
 
     def close_spider(self, spider):
@@ -66,21 +70,37 @@ class EmailPipeline(object):
 
             # jinja template
             from jinja2 import Template
-            template = Template(
-                """
-                <h1>DTM/Launch Report</h1>
-                <p>Rows of data</p>
-                <ul>
-                    <li>
-                    {% for row in data %}
-                        {{ row }}
-                    {% endfor %}
-                    </li>
-                </ul>
-                """
-            )
+            template_file = pkgutil.get_data("analytics_check", "resources/template.html")
+            template_string = template_file.decode("utf-8")
+            template = Template(template_string)
 
-            body:str = template.render(data=self.false_items)
+            print("*****************")
+            print(template)
+            print("*****************")
+
+
+            # with open('template.html') as file_:
+                # template = Template(file_.read())
+            # template.render(name='John')
+
+
+
+            # template = Template(
+            #     """
+            #     <h1>DTM/Launch Report</h1>
+            #     <p>Rows of data</p>
+            #     <ul>
+            #         <li>
+            #         {% for row in data %}
+            #             {{ row }}
+            #         {% endfor %}
+            #         </li>
+            #     </ul>
+            #     """
+            # )
+            body:str = template.render(data=self.all_items)
+           
+
 
             import boto3 # type: ignore
             from botocore.exceptions import ClientError # type: ignore

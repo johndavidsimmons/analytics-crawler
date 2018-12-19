@@ -10,6 +10,7 @@ analytics_check.egg-info/dependency_links.txt
 analytics_check.egg-info/entry_points.txt
 analytics_check.egg-info/top_level.txt
 analytics_check/resources/data.csv
+analytics_check/resources/template.html
 analytics_check/spiders/__init__.py
 analytics_check/spiders/script_check.py
 analytics_check/spiders/settings.py

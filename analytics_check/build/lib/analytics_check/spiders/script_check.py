@@ -1,37 +1,36 @@
-import os
 from datetime import datetime
-from typing import Dict, List
+import os
 import pkgutil
+from typing import Dict, List, Optional
 
-from analytics_check.items import ScriptCheckItem # type: ignore
+from analytics_check.items import ScriptCheckItem
 import scrapy # type: ignore
 import scrapy_splash # type: ignore
-from scrapy.loader import ItemLoader
-from scrapy.utils.project import get_project_settings
+from scrapy.loader import ItemLoader # type: ignore
 
 
 class ScriptSpider(scrapy.Spider):
-    name: str = "script_check"
-    # http_user = "0deb8211a13e4260a3fc5eba4616ade5"
+    name:str = "script_check"
+
+    # scraping hub can't find env variables in the spider
+    # so it must pass as an argument
+    # scrapy crawl script_check -a http_user=abc123
     try:
-        http_user = self.http_user
+        http_user:str = self.http_user
     except:
-        http_user = ""
-
+        http_user:str = os.getenv("http_user")
 
     try:
-        data_bytes = pkgutil.get_data("analytics_check", "resources/data.csv")
-        data_string = data_bytes.decode("utf-8")
-        lst = data_string.split("\r")
-        data = [tuple(i.split(",")) for i in lst]
-        urls = [] 
+        data_bytes:Optional[bytes] = pkgutil.get_data("analytics_check", "resources/data.csv")
+        data_string:str = data_bytes.decode("utf-8")
+        lst:List[str] = data_string.split("\r")
+        data:List[tuple] = [tuple(i.split(",")) for i in lst]
+        urls:List[tuple] = []
         for tup in data:
             (a,b,c) = tup
             urls.append((a.strip(),b,c))
     except Exception as e:
-        print("*****************")
-        print(e)
-        print("*****************")
+        print(f"Error with csv file: {e}")
 
     def start_requests(self):
         for channel, url, script in self.urls:
@@ -48,12 +47,12 @@ class ScriptSpider(scrapy.Spider):
             })
 
     def parse(self, response):
-        script_exists: bool = False
-        script = response.meta['script']
-        channel = response.meta['channel']
-        script_selector: str = f"script[src='{script}']"
+        script_exists:bool = False
+        script:str = response.meta['script']
+        channel:str = response.meta['channel']
+        script_selector:str = f"script[src='{script}']"
         script_element = response.css(script_selector)
-        script_src: str = ""
+        script_src:str = ""
 
         try:
             if script_element:
@@ -63,7 +62,7 @@ class ScriptSpider(scrapy.Spider):
         except Exception as e:
             pass
 
-        data: dict = {
+        data:dict = {
             "channel": channel,
             "url": response.url,
             "script_exists": script_exists,
@@ -73,4 +72,3 @@ class ScriptSpider(scrapy.Spider):
 
         item = ItemLoader(item=ScriptCheckItem(data), response=response)
         return item.load_item()
-

@@ -7,7 +7,7 @@ setup(
     version      = '1.0',
     packages     = find_packages(),
     package_data = {
-        'analytics_check' : ['resources/*.csv']
+        'analytics_check' : ['resources/*.csv', 'resources/*.html']
     },
     entry_points = {
         'scrapy': 
