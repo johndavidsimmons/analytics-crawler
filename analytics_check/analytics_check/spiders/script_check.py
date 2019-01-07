@@ -8,6 +8,17 @@ import scrapy # type: ignore
 import scrapy_splash # type: ignore
 from scrapy.loader import ItemLoader # type: ignore
 
+def script_exists(response, script):
+    exists:bool = False
+    selector:str = f"script[src='{script}']"
+    element = response.css(selector)
+    src:str = ""
+
+    if element:
+        src = element[0].xpath("@src").extract()[0]
+        if src == script:
+            exists = True
+    return exists
 
 class ScriptSpider(scrapy.Spider):
     name:str = "script_check"
@@ -21,22 +32,24 @@ class ScriptSpider(scrapy.Spider):
         http_user:str = os.getenv("http_user")
 
     try:
-        data_bytes:Optional[bytes] = pkgutil.get_data("analytics_check", "resources/data.csv")
+        data_bytes:Optional[bytes] = pkgutil.get_data("analytics_check", "resources/mpart.csv")
         data_string:str = data_bytes.decode("utf-8")
         lst:List[str] = data_string.split("\r")
         data:List[tuple] = [tuple(i.split(",")) for i in lst]
         urls:List[tuple] = []
         for tup in data:
-            (a,b,c) = tup
-            urls.append((a.strip(),b,c))
+            (common_name, prop, url, mparticle, dtm) = tup
+            scripts = [mparticle, dtm]
+            urls.append((common_name.strip(),prop,url,scripts))
     except Exception as e:
         print(f"Error with csv file: {e}")
 
     def start_requests(self):
-        for channel, url, script in self.urls:
+        for common_name, prop, url, scripts in self.urls:
             yield scrapy.Request(url, self.parse, meta={
-                'channel': channel,
-                'script': script,
+                'prop': prop,
+                'common_name': common_name,
+                'scripts': scripts,
                 'splash': {
                     'args': {
                         'html': 1,
@@ -46,27 +59,20 @@ class ScriptSpider(scrapy.Spider):
                 }
             })
 
-    def parse(self, response):
-        script_exists:bool = False
-        script:str = response.meta['script']
-        channel:str = response.meta['channel']
-        script_selector:str = f"script[src='{script}']"
-        script_element = response.css(script_selector)
-        script_src:str = ""
 
-        try:
-            if script_element:
-                script_src = script_element[0].xpath("@src").extract()[0]
-            if script_src == script:
-                script_exists = True
-        except Exception as e:
-            pass
+    def parse(self, response):
+        # scripts = response.meta['scripts']
+        mpart_script, dtm_script = response.meta['scripts']
+        # for s in scripts:
+            # print(s, " | ", script_exists(response, s))
+
 
         data:dict = {
-            "channel": channel,
+            "common_name": response.meta['common_name'],
+            "prop": response.meta['prop'],
             "url": response.url,
-            "script_exists": script_exists,
-            "script": script,
+            "mparticle_exists": script_exists(response, mpart_script),
+            "dtm_exists": script_exists(response, dtm_script),
             "last_checked": datetime.now().strftime('%c')
         }
 

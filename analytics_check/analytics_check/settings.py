@@ -51,7 +51,7 @@ DOWNLOADER_MIDDLEWARES = {
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
    'analytics_check.pipelines.PrintTablePipeline': 300,
-   'analytics_check.pipelines.EmailPipeline': 301,
+   # 'analytics_check.pipelines.EmailPipeline': 301,
 }
 
 # Splash Settings

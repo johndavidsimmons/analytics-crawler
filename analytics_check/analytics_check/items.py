@@ -7,10 +7,10 @@
 
 import scrapy
 
-
 class ScriptCheckItem(scrapy.Item):
+    common_name = scrapy.Field()
+    prop = scrapy.Field()
     url = scrapy.Field()
-    channel = scrapy.Field()
-    script = scrapy.Field()
-    script_exists = scrapy.Field()
+    mparticle_exists = scrapy.Field()
+    dtm_exists = scrapy.Field()
     last_checked = scrapy.Field(serializer=str)
