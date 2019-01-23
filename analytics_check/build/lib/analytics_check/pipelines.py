@@ -65,43 +65,16 @@ class EmailPipeline(object):
 
     def close_spider(self, spider):
 
-        # If there are items in the list
+        # If there are false items in the list
         if self.false_items:
 
             # jinja template
             from jinja2 import Template
-            template_file = pkgutil.get_data("analytics_check", "resources/template.html")
-            template_string = template_file.decode("utf-8")
+            template_file:Optional[bytes] = pkgutil.get_data("analytics_check", "resources/template.html")
+            template_string:str = template_file.decode("utf-8")
             template = Template(template_string)
-
-            print("*****************")
-            print(template)
-            print("*****************")
-
-
-            # with open('template.html') as file_:
-                # template = Template(file_.read())
-            # template.render(name='John')
-
-
-
-            # template = Template(
-            #     """
-            #     <h1>DTM/Launch Report</h1>
-            #     <p>Rows of data</p>
-            #     <ul>
-            #         <li>
-            #         {% for row in data %}
-            #             {{ row }}
-            #         {% endfor %}
-            #         </li>
-            #     </ul>
-            #     """
-            # )
             body:str = template.render(data=self.all_items)
            
-
-
             import boto3 # type: ignore
             from botocore.exceptions import ClientError # type: ignore
 
