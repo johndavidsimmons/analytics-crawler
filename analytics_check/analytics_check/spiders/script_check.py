@@ -41,7 +41,7 @@ class ScriptSpider(scrapy.Spider):
                     'args': {
                         'html': 1,
                         'png': 0,
-                        'wait': 2
+                        'wait': 5
                     },
                 }
             })
