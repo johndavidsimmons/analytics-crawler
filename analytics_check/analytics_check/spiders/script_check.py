@@ -21,7 +21,7 @@ class ScriptSpider(scrapy.Spider):
         http_user:str = os.getenv("http_user")
 
     try:
-        data_bytes:Optional[bytes] = pkgutil.get_data("analytics_check", "resources/data.csv")
+        data_bytes:Optional[bytes] = pkgutil.get_data("analytics_check", "resources/datav2.csv")
         data_string:str = data_bytes.decode("utf-8")
         lst:List[str] = data_string.split("\r")
         data:List[tuple] = [tuple(i.split(",")) for i in lst]
