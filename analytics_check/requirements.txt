@@ -40,7 +40,7 @@ rsa==3.4.2
 s3transfer==0.1.13
 scrapinghub==2.0.3
 Scrapy==1.5.1
-scrapy-splash==0.7.2
+scrapy-splash==0.8.0
 service-identity==18.1.0
 shub==2.8.1
 six==1.12.0
